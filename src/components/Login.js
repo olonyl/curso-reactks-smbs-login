@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import firebase from 'firebase';
 
 class Login extends Component {
     INITIAL_STATE = {
@@ -10,10 +11,13 @@ class Login extends Component {
         super();
         this.state = {
             ...this.INITIAL_STATE,
-            error: ''
+            message: '',
+            message_style: '',
+            loading: false
         }
 
     }
+
     handleChange = (event) => {
         var element = event.target;
 
@@ -28,13 +32,44 @@ class Login extends Component {
     handleSubmit = (event) => {
         event.preventDefault();
 
-        if (!this.state.username) {
-            this.setState({
-                error: 'Username is required'
+        const { username, password } = this.state;
+
+        this.setState({ message: '', loading: true });
+        firebase
+            .auth().
+            signInWithEmailAndPassword(username, password)
+            .then(this.onLoginSuccess)
+            .catch((error) => {
+                firebase
+                    .auth()
+                    .createUserWithEmailAndPassword(username, password)
+                    .then(this.onLoginSuccess)
+                    .catch(this.onLoginFail);
             });
-        }
     }
 
+    onLoginSuccess = () => {
+        this.setState({
+            message: 'Login exitoso!',
+            message_style: 'alert-success',
+            loading: false
+        })
+    }
+
+    onLoginFail = () => {
+        this.setState({
+            message: "Error al ingresar",
+            message_style: "alert-danger",
+            loading: false
+        })
+    }
+
+    renderMenssage = () => {
+        if (this.state.message)
+            return <div className={`alert ${this.state.message_style} mt-2`}>
+                {this.state.message}
+            </div>
+    }
     render() {
         return (
             <div className="Login">
@@ -49,9 +84,7 @@ class Login extends Component {
                                     <img src="/avatar.png" alt="" className="Avatar" />
                                 </div>
                                 <div className="col-12">
-                                    <div className="alert alert-danger mt-2">
-                                        Error: <br /> {this.state.error}
-                                    </div>
+                                    {this.renderMenssage()}
                                 </div>
                                 <div className="col-12">
                                     <label htmlFor="">Username</label>
@@ -62,7 +95,9 @@ class Login extends Component {
                                     <input type="password" name="password" className="form-control" onChange={this.handleChange} value={this.state.password} />
                                 </div>
                                 <div className="col-12 mt-2">
-                                    <input type="submit" name="Login" className="btn btn-success" value="Login" />
+                                    <button name="Login" className="btn btn-success" >
+                                        Login  {this.state.loading && <i class="fas fa-spinner fa-spin"></i>}
+                                    </button>
                                 </div>
                             </div>
                         </form>
