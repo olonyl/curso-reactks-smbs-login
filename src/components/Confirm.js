@@ -18,7 +18,7 @@ class AlertDialog extends React.Component {
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
             >
-                <DialogTitle id="alert-dialog-title">{"Use Google's location service?"}</DialogTitle>
+                <DialogTitle id="alert-dialog-title">{"Confirmar?"}</DialogTitle>
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description">
                         Tu usuario no existe, desea crearlo?
