@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import firebase from 'firebase';
-
+import Confirm from './Confirm';
 class Login extends Component {
     INITIAL_STATE = {
         password: '',
@@ -13,7 +13,8 @@ class Login extends Component {
             ...this.INITIAL_STATE,
             message: '',
             message_style: '',
-            loading: false
+            loading: false,
+            openConfirm: false
         }
 
     }
@@ -40,11 +41,7 @@ class Login extends Component {
             signInWithEmailAndPassword(username, password)
             .then(this.onLoginSuccess)
             .catch((error) => {
-                firebase
-                    .auth()
-                    .createUserWithEmailAndPassword(username, password)
-                    .then(this.onLoginSuccess)
-                    .catch(this.onLoginFail);
+                this.setState({ openConfirm: true, loading: false })
             });
     }
 
@@ -52,7 +49,8 @@ class Login extends Component {
         this.setState({
             message: 'Login exitoso!',
             message_style: 'alert-success',
-            loading: false
+            loading: false,
+            openConfirm: false
         })
     }
 
@@ -60,7 +58,8 @@ class Login extends Component {
         this.setState({
             message: "Error al ingresar",
             message_style: "alert-danger",
-            loading: false
+            loading: false,
+            openConfirm: false
         })
     }
 
@@ -70,9 +69,27 @@ class Login extends Component {
                 {this.state.message}
             </div>
     }
+
+    handleClose = () => {
+        this.setState({ openConfirm: false });
+    };
+
+    handleConfirm = () => {
+        const { username, password } = this.state;
+
+        firebase
+            .auth()
+            .createUserWithEmailAndPassword(username, password)
+            .then(this.onLoginSuccess)
+            .catch(this.onLoginFail);
+    }
+
     render() {
         return (
             <div className="Login">
+                <Confirm open={this.state.openConfirm}
+                    handleClose={this.handleClose}
+                    handleConfirm={this.handleConfirm} />
                 <div className="card">
                     <div className="card-header">
                         Login
