@@ -41,7 +41,9 @@ class Login extends Component {
             signInWithEmailAndPassword(username, password)
             .then(this.onLoginSuccess)
             .catch((error) => {
-                this.setState({ openConfirm: true, loading: false })
+                if (error.code == 'auth/user-not-found')
+                    this.setState({ openConfirm: true, loading: false })
+                else this.setState({ message: 'Datos invalidos', message_style: "alert-danger", loading: false })
             });
     }
 
